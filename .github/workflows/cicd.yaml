@@ -16,6 +16,7 @@ env:
 
 jobs:
   lint:
+    if: github.event_name != 'workflow_dispatch'
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -30,6 +31,7 @@ jobs:
         run: terraform fmt
   
   validate:
+    if: github.event_name != 'workflow_dispatch'
     name: validate
     runs-on: ubuntu-latest
     steps:
@@ -48,7 +50,7 @@ jobs:
   
         
   apply:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [lint, validate]
     name: apply
     runs-on: ubuntu-latest
@@ -69,6 +71,7 @@ jobs:
 
     
   cost-analysis:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: [apply]
     name: cost analysis
     runs-on: ubuntu-latest
