@@ -4,18 +4,105 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }} 
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
 jobs:
   lint:
-    name: Lint
+    name: lint
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       
-      - name: setup tflint
-        uses: terraform-linters/setup-tflint@v4
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 4.33.0
+
+      - name: run fmt
+        run: terraform fmt
+  
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 4.33.0
+      
+      - name: run init
+        run: terraform init 
+
+      - name: run validate
+        run: terraform validate
+  
+        
+  apply:
+    if: github.event_name == 'push'
+    needs: [lint, validate]
+    name: apply
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 4.33.0
+          
+      - name: run init
+        run: terraform init
+
+      - name: run apply
+        run: terraform apply -auto-approve
+
+    
+  cost-analysis:
+    name: cost analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Infracost Actions
+        uses: infracost/actions@v3.0.1
         with:
-          tflint_version:  v0.52.0
-         
-      - name: Run tflint
-        run: tflint -f compact
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: generate cost report
+        run: infracost breakdown --path= ./terraform.tfstate \
+                                 --format=json \
+                                 --out-file=/tmp/infracost.json \
+                                 --terraform-vars-file=dev.tfvars
+      
+      - name: upload cost report
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: infracost-report
+          path: /tmp/infracost.json                          
+  # destroy:
+  #   if: github.event_name == 'push'
+  #   needs: [apply]
+  #   name: destroy
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   steps:
+  #     - uses: actions/checkout@v4
+      
+  #     - name: HashiCorp - Setup Terraform
+  #       uses: hashicorp/setup-terraform@v3.1.2
+  #       with: 
+  #         terraform_version: 4.33.0
+
+  #     - name: run destroy
+  #       run: terraform destroy -auto-approve
