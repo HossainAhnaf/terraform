@@ -8,10 +8,12 @@ resource "azurerm_virtual_network" "main" {
   location            = var.location
   resource_group_name = local.rg_name
   address_space       = local.address_space
+  depends_on = [ azurerm_resource_group.main ]
 }
 
 module "database" {  
   source                 = "./modules/database"
+  depends_on = [  azurerm_resource_group.main ]
   prefix                 = var.prefix
   location               = var.location
   resource_group_name    = local.rg_name
@@ -27,6 +29,7 @@ module "database" {
 
 module "backend" {
   source               = "./modules/backend"
+  depends_on = [  azurerm_virtual_network.main ]
   prefix               = var.prefix
   location             = var.location
   resource_group_name  = local.rg_name
@@ -46,6 +49,7 @@ module "backend" {
 
 module "frontend" {
   source              = "./modules/frontend"
+  depends_on = [  azurerm_virtual_network.main ]
   prefix              = var.prefix
   location            = var.location
   resource_group_name = local.rg_name
