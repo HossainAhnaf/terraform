@@ -1,0 +1,21 @@
+name: ci cd
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: setup tflint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version:  v0.52.0
+         
+      - name: Run tflint
+        run: tflint -f compact
