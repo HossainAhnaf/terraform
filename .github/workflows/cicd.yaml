@@ -24,7 +24,7 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
         with: 
-          terraform_version: 4.33.0
+          terraform_version: 1.10.0
 
       - name: run fmt
         run: terraform fmt
@@ -38,7 +38,7 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
         with: 
-          terraform_version: 4.33.0
+          terraform_version: 1.10.0
       
       - name: run init
         run: terraform init 
@@ -59,7 +59,7 @@ jobs:
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
         with: 
-          terraform_version: 4.33.0
+          terraform_version: 1.10.0
           
       - name: run init
         run: terraform init
@@ -102,7 +102,7 @@ jobs:
   #     - name: HashiCorp - Setup Terraform
   #       uses: hashicorp/setup-terraform@v3.1.2
   #       with: 
-  #         terraform_version: 4.33.0
+  #         terraform_version: 1.10.0
 
   #     - name: run destroy
   #       run: terraform destroy -auto-approve
