@@ -69,18 +69,19 @@ jobs:
 
     
   cost-analysis:
+    needs: [apply]
     name: cost analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Infracost Actions
-        uses: infracost/actions@v2
+        uses: infracost/actions@v3.0.0
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
       - name: generate cost report
-        run: infracost breakdown --path= ./terraform.tfstate \
+        run: infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
                                  --terraform-vars-file=dev.tfvars
