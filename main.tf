@@ -1,9 +1,3 @@
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.2"
-  suffix = ["hossain", "devops"]
-}
-
 resource "azurerm_resource_group" "main" {
   name     = local.rg_name
   location = var.location
@@ -25,7 +19,7 @@ module "database" {
   address_prefixes       = local.db_subnet
   server_sku_name        = var.server_sku_name
   database_version       = var.database_version
-  database_name          = module.naming.resource_group.name #local.db_name
+  database_name          = local.db_name
   virtual_network_id     = azurerm_virtual_network.main.id
   administrator_login    = var.administrator_login
   administrator_password = var.administrator_password
