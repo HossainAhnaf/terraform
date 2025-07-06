@@ -65,7 +65,7 @@ jobs:
         run: terraform init
 
       - name: run apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var-file=dev.tfvars
 
     
   cost-analysis:
