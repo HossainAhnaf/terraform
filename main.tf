@@ -5,20 +5,18 @@ resource "azurerm_resource_group" "main" {
 
 resource "azurerm_virtual_network" "main" {
   name                = local.vnet_name
-  location            = var.location
-  resource_group_name = local.rg_name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
   address_space       = local.address_space
-  depends_on = [ azurerm_resource_group.main ]
 }
 
 module "database" {  
   source                 = "./modules/database"
-  depends_on = [  azurerm_resource_group.main ]
   prefix                 = var.prefix
-  location               = var.location
-  resource_group_name    = local.rg_name
-  virtual_network_name   = local.vnet_name
-  address_prefixes       = local.db_subnet
+  location               = azurerm_resource_group.main.location
+  resource_group_name    = azurerm_resource_group.main.name
+  virtual_network_name   = azurerm_virtual_network.main.name
+  address_prefixes       = local.db_subnet_address_prefix
   server_sku_name        = var.server_sku_name
   database_version       = var.database_version
   database_name          = local.db_name
@@ -29,12 +27,11 @@ module "database" {
 
 module "backend" {
   source               = "./modules/backend"
-  depends_on = [  azurerm_virtual_network.main ]
   prefix               = var.prefix
-  location             = var.location
-  resource_group_name  = local.rg_name
-  virtual_network_name = local.vnet_name
-  address_prefixes     = local.backend_subnet
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = local.backend_subnet_address_prefix
   sku_name             = var.backend_sku_name
   os_type              = var.backend_os_type
   docker_registry_url  = var.docker_registry_url
@@ -49,10 +46,9 @@ module "backend" {
 
 module "frontend" {
   source              = "./modules/frontend"
-  depends_on = [  azurerm_virtual_network.main ]
   prefix              = var.prefix
-  location            = var.location
-  resource_group_name = local.rg_name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
   sku_name            = var.frontend_sku_name
   os_type             = var.frontend_os_type
   docker_registry_url = var.docker_registry_url
@@ -62,5 +58,4 @@ module "frontend" {
 
 output "database_name" {
   value = module.database.database_name
-  
 }
