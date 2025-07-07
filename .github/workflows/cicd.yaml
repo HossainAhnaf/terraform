@@ -99,6 +99,13 @@ jobs:
                                  --out-file=/tmp/infracost.json \
                                  --terraform-vars-file=dev.tfvars
 
+      - name: log ref name
+        run: |
+          echo "${GITHUB_REF}"
+          echo "${GITHUB_head_ref}"
+          echo "${GITHUB_BASE_REF}"
+          echo "${GITHUB_REF_NAME}"
+
         
   apply:
     if: github.ref == 'main' && github.event_name == 'push'
