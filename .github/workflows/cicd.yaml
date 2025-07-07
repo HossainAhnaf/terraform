@@ -61,13 +61,6 @@ jobs:
       - name: run validate
         run: terraform validate
 
-      - name: log ref name
-        run: |
-          echo "ref: ${GITHUB_REF}"
-          echo "head_ref: ${GITHUB_head_ref}"
-          echo "base_ref: ${GITHUB_BASE_REF}"
-          echo "ref_name: ${GITHUB_REF_NAME}"
-       
   
   plan:
     if: github.event_name == 'pull_request'
@@ -110,7 +103,7 @@ jobs:
 
         
   apply:
-    if: github.ref == 'main' && github.event_name == 'push'
+    if: github.ref_name == 'main' && github.event_name == 'push'
     needs: [lint, test, validate]
     name: apply
     runs-on: ubuntu-latest
