@@ -60,13 +60,13 @@ jobs:
 
       - name: run validate
         run: terraform validate
-        
+
       - name: log ref name
         run: |
-          echo "${GITHUB_REF}"
-          echo "${GITHUB_head_ref}"
-          echo "${GITHUB_BASE_REF}"
-          echo "${GITHUB_REF_NAME}"
+          echo "ref: ${GITHUB_REF}"
+          echo "head_ref: ${GITHUB_head_ref}"
+          echo "base_ref: ${GITHUB_BASE_REF}"
+          echo "ref_name: ${GITHUB_REF_NAME}"
        
   
   plan:
