@@ -2,8 +2,6 @@ name: ci cd
 
 on:
   push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -15,8 +13,7 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
 jobs:
-  lint:
-    if: github.event_name != 'workflow_dispatch'
+  lint:    
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +27,24 @@ jobs:
       - name: run fmt
         run: terraform fmt
   
-  validate:
-    if: github.event_name != 'workflow_dispatch'
+  test:    
+    name: test 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 1.10.0
+
+      - name: run init
+        run: terraform init
+    
+      - name: run test
+        run: terraform test
+
+  validate:    
     name: validate
     runs-on: ubuntu-latest
     steps:
@@ -48,10 +61,48 @@ jobs:
       - name: run validate
         run: terraform validate
   
+  plan:
+    if: github.event_name == 'pull_request'
+    needs: [lint, test, validate]
+    name: plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 1.10.0
+          
+      - name: run init
+        run: terraform init
+
+      - name: run plan
+        run: terraform plan
+
+  
+  cost-analysis-dev:
+    needs: plan
+    name: cost analysis dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Infracost Actions
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: generate cost report
+        run: infracost breakdown --path=. \
+                                 --format=json \
+                                 --out-file=/tmp/infracost.json \
+                                 --terraform-vars-file=dev.tfvars
+
         
   apply:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs: [lint, validate]
+    if: github.base_ref == 'main' && github.event_name == 'push'
+    needs: [lint, test, validate]
     name: apply
     runs-on: ubuntu-latest
     environment: production
@@ -70,10 +121,9 @@ jobs:
       #   run: terraform apply -auto-approve -var-file=dev.tfvars
 
     
-  cost-analysis:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs: [apply]
-    name: cost analysis
+  cost-analysis-prod:
+    needs: apply
+    name: cost analysis prod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,7 +144,11 @@ jobs:
         with:
           name: infracost-report
           path: /tmp/infracost.json                          
-  # destroy:
+ 
+ 
+ 
+ 
+          # destroy:
   #   if: github.event_name == 'push'
   #   needs: [apply]
   #   name: destroy
