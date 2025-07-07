@@ -101,7 +101,7 @@ jobs:
 
         
   apply:
-    if: github.base_ref == 'main' && github.event_name == 'push'
+    if: github.ref == 'main' && github.event_name == 'push'
     needs: [lint, test, validate]
     name: apply
     runs-on: ubuntu-latest
