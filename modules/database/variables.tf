@@ -1,9 +1,9 @@
 variable "prefix" {
-  description = "The prefix used for all resources" 
+  description = "The prefix used for all resources"
 }
 
 variable "location" {
- description = "The location/region where the resources are created."
+  description = "The location/region where the resources are created."
 }
 
 variable "resource_group_name" {
@@ -18,8 +18,8 @@ variable "virtual_network_id" {
 }
 variable "address_prefixes" {
   description = "The address prefixes"
-  type = list(string)  
-  }
+  type        = list(string)
+}
 
 variable "server_sku_name" {
   description = "The sku name"
@@ -42,9 +42,9 @@ variable "database_name" {
 
 variable "charset" {
   description = "The mysql charset"
-  default = "utf8mb4"
+  default     = "utf8mb4"
 }
 variable "collation" {
   description = "The mysql collation"
-  default = "utf8mb4_unicode_ci"
+  default     = "utf8mb4_unicode_ci"
 }

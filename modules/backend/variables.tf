@@ -1,9 +1,9 @@
 variable "prefix" {
-  description = "The prefix used for all resources" 
+  description = "The prefix used for all resources"
 }
 
 variable "location" {
- description = "The location/region where the resources are created."
+  description = "The location/region where the resources are created."
 }
 
 variable "resource_group_name" {
@@ -15,8 +15,8 @@ variable "virtual_network_name" {
 }
 variable "address_prefixes" {
   description = "The address prefixes"
-  type = list(string)  
-  }
+  type        = list(string)
+}
 
 variable "sku_name" {
   description = "The sku name"
@@ -36,6 +36,6 @@ variable "docker_image_name" {
 }
 
 variable "app_settings" {
-  type = map(string)
+  type        = map(string)
   description = "The app settings"
 }

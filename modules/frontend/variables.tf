@@ -3,7 +3,7 @@ variable "prefix" {
 }
 
 variable "location" {
- description = "The location/region where the resources are created."
+  description = "The location/region where the resources are created."
 }
 
 variable "resource_group_name" {

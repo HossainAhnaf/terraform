@@ -10,7 +10,7 @@ resource "azurerm_virtual_network" "main" {
   address_space       = local.address_space
 }
 
-module "database" {  
+module "database" {
   source                 = "./modules/database"
   prefix                 = var.prefix
   location               = azurerm_resource_group.main.location
