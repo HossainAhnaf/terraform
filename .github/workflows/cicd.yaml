@@ -85,24 +85,48 @@ jobs:
   
   pre-cost-analysis:
     needs: plan
-    name: pre cost analysis
+    name: Pre cost analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
 
       - name: Infracost Actions
         uses: infracost/actions/setup@v3
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - name: generate cost report
+          
+      - name: Checkout Base Branch
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.base.ref }}'
+      
+      - name: Generate Infracost cost estimate baseline
         run: infracost breakdown --path=. \
                                  --format=json \
-                                 --out-file=/tmp/infracost.json \
+                                 --out-file=/tmp/infracost-base.json \
                                  --terraform-vars-file=dev.tfvars
 
 
-        
+      - name: Checkout Pr Branch
+        uses: actions/checkout@v4
+
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --path=. \
+                          --format=json \
+                          --compare-to=/tmp/infracost-base.json \
+                          --out-file=/tmp/infracost-diff.json   
+
+      - name: Post Infracost comment
+        run: |
+            infracost comment github --path=/tmp/infracost-diff.json \
+                                     --repo=$GITHUB_REPOSITORY \
+                                     --github-token=${{ github.token }} \
+                                     --pull-request=${{ github.event.pull_request.number }} \
+                                     --behavior=update   
+                                     
+ 
+
   apply:
     if: github.ref_name == 'main' && github.event_name == 'push'
     needs: [lint, test, validate]
@@ -126,7 +150,7 @@ jobs:
     
   post-cost-analysis:
     needs: apply
-    name: post cost analysis 
+    name: Post cost analysis 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
