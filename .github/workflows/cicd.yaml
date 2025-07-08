@@ -113,7 +113,6 @@ jobs:
                                  --format=json \
                                  --out-file=infracost-base.json \
                                  --terraform-var-file=dev.tfvars
-                                 --log-level=debug
       - name: Debug workspace
         run: ls -R
 
