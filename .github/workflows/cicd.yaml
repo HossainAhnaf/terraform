@@ -179,10 +179,11 @@ jobs:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
       - name: generate cost report
-        run: infracost breakdown --path=. \
+        run: |
+          infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
-                                 --terraform-vars-file=dev.tfvars
+                                 --terraform-var-file=dev.tfvars
       
       - name: upload cost report
         uses: actions/upload-artifact@v4.6.2
