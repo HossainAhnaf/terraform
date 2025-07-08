@@ -109,12 +109,13 @@ jobs:
         run: terraform init
       
       - name: Generate Infracost cost estimate baseline
-        run: infracost breakdown --path=. \
+        run: |
+          infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=infracost-base.json \
                                  --terraform-var-file=dev.tfvars
-             ls -lh infracost-base.json
-             
+          ls -lh infracost-base.json
+
       - name: Debug workspace
         run: ls -R
 
