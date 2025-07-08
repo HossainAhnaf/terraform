@@ -112,9 +112,8 @@ jobs:
         run: |
           infracost breakdown --path=. \
                                  --format=json \
-                                 --out-file=infracost-base.json \
+                                 --out-file=/tmp/infracost-base.json \
                                  --terraform-var-file=dev.tfvars
-          ls -lh infracost-base.json
 
       - name: Debug workspace
         run: ls -R
@@ -129,8 +128,8 @@ jobs:
         run: |
           infracost diff --path=. \
                           --format=json \
-                          --compare-to=infracost-base.json \
-                          --out-file=infracost-diff.json  
+                          --compare-to=/tmp/infracost-base.json \
+                          --out-file=/tmp/infracost-diff.json  
            
 
       - name: Post Infracost comment
