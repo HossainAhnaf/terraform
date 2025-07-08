@@ -11,7 +11,10 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }} 
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-
+  
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
 
   lint:    
@@ -85,24 +88,63 @@ jobs:
   
   pre-cost-analysis:
     needs: plan
-    name: pre cost analysis
+    name: Pre cost analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
 
       - name: Infracost Actions
         uses: infracost/actions/setup@v3
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - name: generate cost report
-        run: infracost breakdown --path=. \
+          
+      - name: Checkout Base Branch
+        uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.base.ref }}'
+
+      - name : HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+        with: 
+          terraform_version: 1.10.0
+          
+      - name: run init
+        run: terraform init
+      
+      - name: Generate Infracost cost estimate baseline
+        run: |
+          infracost breakdown --path=. \
                                  --format=json \
-                                 --out-file=/tmp/infracost.json \
-                                 --terraform-vars-file=dev.tfvars
+                                 --out-file=/tmp/infracost-base.json \
+                                 --terraform-var-file=dev.tfvars
 
+      - name: Debug workspace
+        run: ls -R
 
-        
+      - name: Checkout Pr Branch
+        uses: actions/checkout@v4
+
+      - name: Debug workspace
+        run: ls -R
+
+      - name: Generate Infracost diff
+        run: |
+          infracost diff --path=. \
+                          --format=json \
+                          --compare-to=/tmp/infracost-base.json \
+                          --out-file=/tmp/infracost-diff.json  
+           
+
+      - name: Post Infracost comment
+        run: |
+            infracost comment github --path=/tmp/infracost-diff.json \
+                                     --repo=$GITHUB_REPOSITORY \
+                                     --github-token=${{ github.token }} \
+                                     --pull-request=${{ github.event.pull_request.number }} \
+                                     --behavior=update   
+                                     
+ 
+
   apply:
     if: github.ref_name == 'main' && github.event_name == 'push'
     needs: [lint, test, validate]
@@ -126,7 +168,7 @@ jobs:
     
   post-cost-analysis:
     needs: apply
-    name: post cost analysis 
+    name: Post cost analysis 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -137,10 +179,11 @@ jobs:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
       - name: generate cost report
-        run: infracost breakdown --path=. \
+        run: |
+          infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
-                                 --terraform-vars-file=dev.tfvars
+                                 --terraform-var-file=dev.tfvars
       
       - name: upload cost report
         uses: actions/upload-artifact@v4.6.2
