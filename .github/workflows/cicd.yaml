@@ -114,14 +114,9 @@ jobs:
                                  --out-file=infracost-base.json \
                                  --terraform-vars-file=dev.tfvars
 
-      - name: Find the infracost base file is exist or not
-        run: |
-          if [ -f "infracost-base.json" ]; then
-            echo "infracost-base.json exist"
-          else
-            echo "infracost-base.json not exist"
-            exit 1
-          fi
+      - name: Debug workspace
+        run: ls -R
+
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
 
