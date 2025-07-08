@@ -106,17 +106,26 @@ jobs:
                                  --out-file=infracost-base.json \
                                  --terraform-vars-file=dev.tfvars
 
-      - name: run ls
+      - name: Find the infracost base file is exist or not
         run: |
-          ls -la
+          if [ -f "infracost-base.json" ]; then
+            echo "infracost-base.json exist"
+          else
+            echo "infracost-base.json not exist"
+            exit 1
+          fi
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
 
-        
-      - name: run ls
+      - name: Find the infracost base file is exist or not
         run: |
-          ls -la
-          
+          if [ -f "infracost-base.json" ]; then
+            echo "infracost-base.json exist"
+          else
+            echo "infracost-base.json not exist"
+            exit 1
+          fi
+
       - name: Generate Infracost diff
         run: |
           infracost diff --path=. \
