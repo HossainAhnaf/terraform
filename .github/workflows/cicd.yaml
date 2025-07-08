@@ -103,23 +103,30 @@ jobs:
       - name: Generate Infracost cost estimate baseline
         run: infracost breakdown --path=. \
                                  --format=json \
-                                 --out-file=/tmp/infracost-base.json \
+                                 --out-file=infracost-base.json \
                                  --terraform-vars-file=dev.tfvars
 
-
+      - name: run ls
+        run: |
+          ls -la
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
 
+        
+      - name: run ls
+        run: |
+          ls -la
+          
       - name: Generate Infracost diff
         run: |
           infracost diff --path=. \
                           --format=json \
-                          --compare-to=/tmp/infracost-base.json \
-                          --out-file=/tmp/infracost-diff.json   
+                          --compare-to=infracost-base.json \
+                          --out-file=infracost-diff.json   
 
       - name: Post Infracost comment
         run: |
-            infracost comment github --path=/tmp/infracost-diff.json \
+            infracost comment github --path=infracost-diff.json \
                                      --repo=$GITHUB_REPOSITORY \
                                      --github-token=${{ github.token }} \
                                      --pull-request=${{ github.event.pull_request.number }} \
