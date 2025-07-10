@@ -23,13 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          terraform_version: 1.10.0
-
-      - name: run fmt
-        run: terraform fmt -check
+      - name: terraform fmt check
+        uses: dflook/terraform-fmt-check@v2
 
   test:
     name: test
@@ -37,16 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          terraform_version: 1.10.0
-
-      - name: run init
-        run: terraform init
-
-      - name: run test
-        run: terraform test
+      - name: Terraform Tests
+        uses: dflook/terraform-test@v2
 
   validate:
     name: validate
@@ -54,16 +41,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          terraform_version: 1.10.0
-
-      - name: run init
-        run: terraform init
-
-      - name: run validate
-        run: terraform validate
+      - name: Terraform Validate
+        uses: dflook/terraform-validate@v2
 
 
   plan:
@@ -74,17 +53,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
+      - name: terraform plan
+        uses: dflook/terraform-plan@v2
         with:
-          terraform_version: 1.10.0
-
-      - name: run init
-        run: terraform init
-
-      - name: run plan
-        run: terraform plan -var-file=dev.tfvars
-
+          var_file: dev.tfvars
 
   pre-cost-analysis:
     needs: plan
