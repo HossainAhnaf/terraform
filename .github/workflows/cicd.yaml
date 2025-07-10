@@ -42,7 +42,6 @@ jobs:
 
       - name: Terraform Tests
         uses: terraform test
-        # uses: dflook/terraform-test@v2
 
   validate:
     name: validate
