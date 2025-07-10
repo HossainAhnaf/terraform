@@ -41,7 +41,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Tests
-        uses: terraform test
+        run: terraform test
 
   validate:
     name: validate
