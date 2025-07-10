@@ -24,11 +24,9 @@ module "avm-res-web-site" {
     application_stack = {
       docker = [
         {
-          image_name        = var.docker_image_name
-          image_tag         = var.docker_image_tag
-          registry_url      = var.docker_registry_url
-          registry_username = var.registry_username
-          registry_password = var.registry_password
+          image_name   = var.docker_image_name
+          image_tag    = var.docker_image_tag
+          registry_url = var.docker_registry_url
         }
       ]
     }
