@@ -37,14 +37,18 @@ module "avm-res-web-site" {
   resource_group_name      = var.resource_group_name
   service_plan_resource_id = module.avm-res-web-serverfarm.resource_id
   os_type                  = var.os_type
-  docker_image_name = {
-    value = var.docker_image_name
-  }
-  docker_image_tag = {
-    value = var.docker_image_tag
-  }
-  docker_registry_url = {
-    value = var.docker_registry_url
+  site_config = {
+    application_stack = {
+      docker = [
+        {
+          image_name        = var.docker_image_name
+          image_tag         = var.docker_image_tag
+          registry_url      = var.docker_registry_url
+          registry_username = var.registry_username
+          registry_password = var.registry_password
+        }
+      ]
+    }
   }
   app_settings = var.app_settings
 }
