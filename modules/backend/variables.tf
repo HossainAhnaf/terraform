@@ -43,6 +43,11 @@ variable "docker_image_name" {
   type        = string
 }
 
+variable "docker_image_tag" {
+  description = "The docker image tag"
+  type        = string
+}
+
 variable "app_settings" {
   type        = map(string)
   description = "The app settings"

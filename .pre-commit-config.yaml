@@ -17,6 +17,6 @@ repos:
          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
      - id: terraform_validate
        exclude: ^modules/
-    #  - id: terraform_checkov
-    #    args:
-    #      - --args=--quiet
+     - id: terraform_checkov
+       args:
+         - --args=--quiet

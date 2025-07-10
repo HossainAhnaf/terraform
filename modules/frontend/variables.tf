@@ -32,3 +32,8 @@ variable "docker_image_name" {
   description = "The docker image name"
   type        = string
 }
+
+variable "docker_image_tag" {
+  description = "The docker image tag"
+  type        = string
+}

@@ -1,23 +1,31 @@
-
-resource "azurerm_service_plan" "frontend_plan" {
+module "avm-res-web-serverfarm" {
+  source              = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm.git?ref=8ca49e283a7ede30927377cee1154b3cde8a81cc"
+  enable_telemetry    = false
   name                = local.frontend_plan_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku_name            = var.sku_name
   os_type             = var.os_type
+  sku_name            = var.sku_name
+
 }
 
-resource "azurerm_linux_web_app" "frontend" {
-  name                = local.frontend_webapp_name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  service_plan_id     = azurerm_service_plan.frontend_plan.id
 
-  site_config {
-    always_on = false
-    application_stack {
-      docker_registry_url = var.docker_registry_url
-      docker_image_name   = var.docker_image_name
+module "avm-res-web-site" {
+  source                   = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-site.git?ref=c9382221b09b017c15c91c0c19ac7b5a43ceec19"
+  enable_telemetry         = false
+  name                     = local.frontend_webapp_name
+  kind                     = "webapp"
+  location                 = var.location
+  resource_group_name      = var.resource_group_name
+  service_plan_resource_id = module.avm-res-web-serverfarm.resource_id
+  os_type                  = var.os_type
+  site_config = {
+    application_stack = {
+      docker = {
+        registry_url = var.docker_registry_url
+        image_name   = var.docker_image_name
+        image_tag    = var.docker_image_tag
+      }
     }
   }
 }

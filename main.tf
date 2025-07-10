@@ -36,6 +36,7 @@ module "backend" {
   os_type              = var.backend_os_type
   docker_registry_url  = var.docker_registry_url
   docker_image_name    = var.backend_docker_image_name
+  docker_image_tag     = var.backend_docker_image_tag
   app_settings = {
     SPRING_DATASOURCE_URL      = "jdbc:mysql://${module.database.server_fqdn}:3306/${module.database.database_name}?allowPublicKeyRetrieval=true&useSSL=true&createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Paris"
     SPRING_DATASOURCE_USERNAME = var.administrator_login
@@ -53,4 +54,5 @@ module "frontend" {
   os_type             = var.frontend_os_type
   docker_registry_url = var.docker_registry_url
   docker_image_name   = var.frontend_docker_image_name
+  docker_image_tag    = var.frontend_docker_image_tag
 }

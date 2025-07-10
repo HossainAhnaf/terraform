@@ -57,8 +57,17 @@ variable "backend_docker_image_name" {
   description = "Docker image for backend App Service"
   type        = string
 }
+variable "backend_docker_image_tag" {
+  description = "Docker image tag for backend App Service"
+  type        = string
+}
 
 variable "frontend_docker_image_name" {
   description = "Docker image for frontend App Service"
+  type        = string
+}
+
+variable "frontend_docker_image_tag" {
+  description = "Docker image tag for frontend App Service"
   type        = string
 }
