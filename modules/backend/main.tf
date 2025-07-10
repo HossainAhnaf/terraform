@@ -17,7 +17,7 @@ resource "azurerm_subnet" "backend_subnet" {
   }
 }
 
-resource "azurerm_service_plan" "backend-plan" {
+resource "azurerm_service_plan" "backend_plan" {
   name                = local.backend_plan_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -29,7 +29,7 @@ resource "azurerm_linux_web_app" "backend" {
   name                = local.backend_webapp_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  service_plan_id     = azurerm_service_plan.backend-plan.id
+  service_plan_id     = azurerm_service_plan.backend_plan.id
 
   site_config {
     always_on = true

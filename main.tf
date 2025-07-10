@@ -54,8 +54,3 @@ module "frontend" {
   docker_registry_url = var.docker_registry_url
   docker_image_name   = var.frontend_docker_image_name
 }
-
-
-output "database_name" {
-  value = module.database.database_name
-}

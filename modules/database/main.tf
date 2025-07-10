@@ -52,11 +52,3 @@ resource "azurerm_mysql_flexible_database" "main" {
   charset             = var.charset
   collation           = var.collation
 }
-
-output "server_fqdn" {
-  value = azurerm_mysql_flexible_server.main.fqdn
-}
-
-output "database_name" {
-  value = azurerm_mysql_flexible_database.main.name
-}

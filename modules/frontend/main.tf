@@ -1,5 +1,5 @@
 
-resource "azurerm_service_plan" "frontend-plan" {
+resource "azurerm_service_plan" "frontend_plan" {
   name                = local.frontend_plan_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -11,7 +11,7 @@ resource "azurerm_linux_web_app" "frontend" {
   name                = local.frontend_webapp_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  service_plan_id     = azurerm_service_plan.frontend-plan.id
+  service_plan_id     = azurerm_service_plan.frontend_plan.id
 
   site_config {
     always_on = false
