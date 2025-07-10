@@ -21,11 +21,11 @@ module "avm-res-web-site" {
   os_type                  = var.os_type
   site_config = {
     application_stack = {
-      docker = {
-        registry_url = var.docker_registry_url
-        image_name   = var.docker_image_name
-        image_tag    = var.docker_image_tag
-      }
+
+      docker_image_name   = var.docker_image_name
+      docker_image_tag    = var.docker_image_tag
+      docker_registry_url = var.docker_registry_url
+
     }
   }
 }
