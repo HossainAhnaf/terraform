@@ -31,9 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+      - name: Terraform Init
+        run: terraform init
       - name: Terraform Tests
-        uses: dflook/terraform-test@v2
+        # uses: dflook/terraform-test@v2
+        uses: terraform test
 
   validate:
     name: validate
