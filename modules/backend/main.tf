@@ -39,13 +39,10 @@ module "avm-res-web-site" {
   os_type                  = var.os_type
   site_config = {
     application_stack = {
-      docker = [
-        {
-          image_name   = var.docker_image_name
-          image_tag    = var.docker_image_tag
-          registry_url = var.docker_registry_url
-        }
-      ]
+      docker = {
+        docker_registry_url = var.docker_registry_url
+        docker_image_name   = "${var.docker_image_name}:${var.docker_image_tag}"
+      }
     }
   }
   app_settings = var.app_settings
