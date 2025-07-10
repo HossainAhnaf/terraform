@@ -23,6 +23,11 @@ variable "os_type" {
   type        = string
 }
 
+variable "worker_count" {
+  description = "The worker count"
+  type        = number
+}
+
 variable "docker_registry_url" {
   description = "The docker registry url"
   type        = string

@@ -18,14 +18,15 @@ resource "azurerm_subnet" "backend_subnet" {
 }
 
 module "avm-res-web-serverfarm" {
-  source              = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm.git?ref=8ca49e283a7ede30927377cee1154b3cde8a81cc"
-  enable_telemetry    = false
-  name                = local.backend_plan_name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  os_type             = var.os_type
-  sku_name            = var.sku_name
-  worker_count        = 1
+  source                 = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm.git?ref=8ca49e283a7ede30927377cee1154b3cde8a81cc"
+  enable_telemetry       = false
+  name                   = local.backend_plan_name
+  location               = var.location
+  resource_group_name    = var.resource_group_name
+  os_type                = var.os_type
+  sku_name               = var.sku_name
+  worker_count           = var.worker_count
+  zone_balancing_enabled = false
 }
 
 

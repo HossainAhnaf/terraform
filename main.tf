@@ -34,6 +34,7 @@ module "backend" {
   address_prefixes     = local.backend_subnet_address_prefix
   sku_name             = var.backend_sku_name
   os_type              = var.backend_os_type
+  worker_count         = var.backend_worker_count
   docker_registry_url  = var.docker_registry_url
   docker_image_name    = var.backend_docker_image_name
   docker_image_tag     = var.backend_docker_image_tag
@@ -52,6 +53,7 @@ module "frontend" {
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = var.frontend_sku_name
   os_type             = var.frontend_os_type
+  worker_count        = var.frontend_worker_count
   docker_registry_url = var.docker_registry_url
   docker_image_name   = var.frontend_docker_image_name
   docker_image_tag    = var.frontend_docker_image_tag
