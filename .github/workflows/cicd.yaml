@@ -11,7 +11,6 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   GITHUB_TOKEN: ${{ github.token }}
-  WORKSPACE: ${{ github.ref_name }}
 
 permissions:
   contents: read
@@ -26,8 +25,6 @@ jobs:
 
       - name: terraform fmt check
         uses: dflook/terraform-fmt-check@v2
-        with:
-          workspace: ${{ env.WORKSPACE }}
 
   test:
     name: test
@@ -35,11 +32,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: log refs
+        run: |
+          echo "head ref: ${{ github.head_ref }}"
+          echo "base ref: ${{ github.base_ref }}"
+          echo "ref: ${{ github.ref }}"
+          echo "ref name: ${{ github.ref_name }}"
+
       - name: terraform test
         uses: dflook/terraform-test@v2
         with:
-          workspace: ${{ env.WORKSPACE }}
-          var_file: "${{ env.WORKSPACE }}.tfvars"
+          var_file: "${{ github.head_ref }}.tfvars"
 
   validate:
     name: validate
@@ -50,8 +53,7 @@ jobs:
       - name: Terraform Validate
         uses: dflook/terraform-validate@v2
         with:
-          workspace: ${{ env.WORKSPACE }}
-          var_file: "${{ env.WORKSPACE }}.tfvars"
+          workspace: ${{ github.head_ref }}
 
 
   plan:
@@ -65,8 +67,8 @@ jobs:
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
-          workspace: ${{ env.WORKSPACE }}
-          var_file: "${{ env.WORKSPACE }}.tfvars"
+          workspace: ${{ github.head_ref }}
+          var_file: "${{ github.head_ref }}.tfvars"
 
   pre-cost-analysis:
     needs: plan
