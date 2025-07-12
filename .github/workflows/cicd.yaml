@@ -1,5 +1,4 @@
 name: ci cd
-
 on:
   push:
   pull_request:
@@ -9,83 +8,77 @@ on:
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }} 
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  
+  GITHUB_TOKEN: ${{ github.token }}
+
 permissions:
   contents: read
   pull-requests: write
 jobs:
+  init:
+    name: Determine Workspace
+    runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.set_workspace.outputs.workspace }}
+    steps:
+      - id: set_workspace
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "workspace=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+          else
+            echo "workspace=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
 
-  lint:    
+  lint:
+    needs: init
     name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with: 
-          terraform_version: 1.10.0
 
-      - name: run fmt
-        run: terraform fmt
-     
-  test:    
-    name: test 
+      - name: terraform fmt check
+        uses: dflook/terraform-fmt-check@v2
+
+  test:
+    needs: init
+    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with: 
-          terraform_version: 1.10.0
 
-      - name: run init
-        run: terraform init
-    
-      - name: run test
-        run: terraform test
+      - name: terraform test
+        uses: dflook/terraform-test@v2
+        with:
+          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
 
-  validate:    
+  validate:
+    needs: init
     name: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with: 
-          terraform_version: 1.10.0
-      
-      - name: run init
-        run: terraform init 
 
-      - name: run validate
-        run: terraform validate
+      - name: Terraform Validate
+        uses: dflook/terraform-validate@v2
+        with:
+          workspace: ${{ needs.init.outputs.workspace }}
 
-  
+
   plan:
     if: github.event_name == 'pull_request'
-    needs: [lint, test, validate]
+    needs: [lint, test, validate, init]
     name: plan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v3.1.2
-        with: 
-          terraform_version: 1.10.0
-          
-      - name: run init
-        run: terraform init
 
-      - name: run plan
-        run: terraform plan -var-file=dev.tfvars
+      - name: terraform plan
+        uses: dflook/terraform-plan@v2
+        with:
+          workspace: ${{ needs.init.outputs.workspace }}
+          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
 
-  
   pre-cost-analysis:
     needs: plan
     name: Pre cost analysis
@@ -97,7 +90,7 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-          
+
       - name: Checkout Base Branch
         uses: actions/checkout@v4
         with:
@@ -105,35 +98,33 @@ jobs:
 
       - name : HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
-        with: 
+        with:
           terraform_version: 1.10.0
-          
+
+
       - name: run init
         run: terraform init
-      
+
       - name: Generate Infracost cost estimate baseline
         run: |
           infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost-base.json \
-                                 --terraform-var-file=dev.tfvars
+                                 --terraform-var-file="dev.tfvars"
 
-      - name: Debug workspace
-        run: ls -R
+
+
 
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
-
-      - name: Debug workspace
-        run: ls -R
 
       - name: Generate Infracost diff
         run: |
           infracost diff --path=. \
                           --format=json \
                           --compare-to=/tmp/infracost-base.json \
-                          --out-file=/tmp/infracost-diff.json  
-           
+                          --out-file=/tmp/infracost-diff.json
+
 
       - name: Post Infracost comment
         run: |
@@ -141,9 +132,9 @@ jobs:
                                      --repo=$GITHUB_REPOSITORY \
                                      --github-token=${{ github.token }} \
                                      --pull-request=${{ github.event.pull_request.number }} \
-                                     --behavior=update   
-                                     
- 
+                                     --behavior=update
+
+
 
   apply:
     if: github.ref_name == 'main' && github.event_name == 'push'
@@ -153,22 +144,17 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
-      
-      # - name: HashiCorp - Setup Terraform
-      #   uses: hashicorp/setup-terraform@v3.1.2
-      #   with: 
-      #     terraform_version: 1.10.0
-          
-      # - name: run init
-      #   run: terraform init
 
-      # - name: run apply
-      #   run: terraform apply -auto-approve -var-file=dev.tfvars
+      # - name: terraform apply
+      #   uses: dflook/terraform-apply@v2
+      #   with:
+      #     workspace: prod
+      #     var_file: prod.tfvars
+      #     auto_approve: true
 
-    
   post-cost-analysis:
     needs: apply
-    name: Post cost analysis 
+    name: Post cost analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -184,29 +170,9 @@ jobs:
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
                                  --terraform-var-file=dev.tfvars
-      
+
       - name: upload cost report
         uses: actions/upload-artifact@v4.6.2
         with:
           name: infracost-report
-          path: /tmp/infracost.json                          
- 
- 
- 
- 
-          # destroy:
-  #   if: github.event_name == 'push'
-  #   needs: [apply]
-  #   name: destroy
-  #   runs-on: ubuntu-latest
-  #   environment: production
-  #   steps:
-  #     - uses: actions/checkout@v4
-      
-  #     - name: HashiCorp - Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3.1.2
-  #       with: 
-  #         terraform_version: 1.10.0
-
-  #     - name: run destroy
-  #       run: terraform destroy -auto-approve
+          path: /tmp/infracost.json

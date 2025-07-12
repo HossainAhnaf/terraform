@@ -1,4 +1,5 @@
 locals {
+  project_name                  = "spring-react-devops"
   rg_name                       = "${var.prefix}-rg"
   vnet_name                     = "${var.prefix}-vnet"
   db_name                       = "${var.prefix}-mysql-db"

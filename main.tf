@@ -10,7 +10,7 @@ resource "azurerm_virtual_network" "main" {
   address_space       = local.address_space
 }
 
-module "database" {  
+module "database" {
   source                 = "./modules/database"
   prefix                 = var.prefix
   location               = azurerm_resource_group.main.location
@@ -34,8 +34,10 @@ module "backend" {
   address_prefixes     = local.backend_subnet_address_prefix
   sku_name             = var.backend_sku_name
   os_type              = var.backend_os_type
+  worker_count         = var.backend_worker_count
   docker_registry_url  = var.docker_registry_url
   docker_image_name    = var.backend_docker_image_name
+  docker_image_tag     = var.backend_docker_image_tag
   app_settings = {
     SPRING_DATASOURCE_URL      = "jdbc:mysql://${module.database.server_fqdn}:3306/${module.database.database_name}?allowPublicKeyRetrieval=true&useSSL=true&createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Paris"
     SPRING_DATASOURCE_USERNAME = var.administrator_login
@@ -51,11 +53,8 @@ module "frontend" {
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = var.frontend_sku_name
   os_type             = var.frontend_os_type
+  worker_count        = var.frontend_worker_count
   docker_registry_url = var.docker_registry_url
   docker_image_name   = var.frontend_docker_image_name
-}
-
-
-output "database_name" {
-  value = module.database.database_name
+  docker_image_tag    = var.frontend_docker_image_tag
 }

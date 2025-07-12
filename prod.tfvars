@@ -9,11 +9,11 @@ administrator_password = "P@ssw0rd123!" # ⚠️ NEVER commit this file to Git
 
 frontend_sku_name     = "B1"
 frontend_os_type      = "Linux"
-frontend_worker_count = 1
+frontend_worker_count = 3
 
 backend_sku_name     = "B1"
 backend_os_type      = "Linux"
-backend_worker_count = 1
+backend_worker_count = 3
 
 docker_registry_url        = "https://ghcr.io/hossainahnaf"
 backend_docker_image_name  = "spring-react-devops-appservice-backend"
