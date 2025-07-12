@@ -25,9 +25,15 @@ jobs:
       - id: set_workspace
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "workspace=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+            branch="${GITHUB_HEAD_REF}"
           else
-            echo "workspace=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            branch="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ "$branch" == "main" ]]; then
+            echo "workspace=prod" >> $GITHUB_OUTPUT
+          else
+            echo "workspace=$branch" >> $GITHUB_OUTPUT
           fi
 
   lint:
