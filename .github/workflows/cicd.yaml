@@ -19,14 +19,34 @@ permissions:
   pull-requests: write
 jobs:
 
-  lint:
-    name: lint
+  format:
+    name: format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: terraform fmt check
         uses: dflook/terraform-fmt-check@v2
+
+  lint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout source code
+
+    - uses: actions/cache@v4
+      with:
+        path: ~/.tflint.d/plugins
+        key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v4
+
+    - name: Init TFLint
+      run: tflint --init
+
+    - name: Run TFLint
+      run: tflint --config="$(pwd)/.tflint.hcl" --recursive
 
   test:
     name: test
@@ -50,10 +70,28 @@ jobs:
         with:
           workspace: ${{ env.WORKSPACE_NAME }}
 
+  scan:
+    name: Security Scan
+    permissions:
+      security-events: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
 
   plan:
     if: github.event_name == 'pull_request'
-    needs: [lint, test, validate]
+    needs: [lint, test, validate, format, scan]
     name: plan
     runs-on: ubuntu-latest
     steps:
@@ -124,7 +162,7 @@ jobs:
 
   apply:
     if: github.ref_name == 'main' && github.event_name == 'push'
-    needs: [lint, test, validate]
+    needs: [lint, test, validate, format, scan]
     name: apply
     runs-on: ubuntu-latest
     environment: production
