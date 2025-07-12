@@ -16,8 +16,22 @@ permissions:
   contents: read
   pull-requests: write
 jobs:
+  init:
+    name: Determine Workspace
+    runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.set_workspace.outputs.workspace }}
+    steps:
+      - id: set_workspace
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "workspace=${GITHUB_HEAD_REF}" >> $GITHUB_OUTPUT
+          else
+            echo "workspace=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
 
   lint:
+    needs: init
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -27,24 +41,19 @@ jobs:
         uses: dflook/terraform-fmt-check@v2
 
   test:
+    needs: init
     name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: log refs
-        run: |
-          echo "head ref: ${{ github.head_ref }}"
-          echo "base ref: ${{ github.base_ref }}"
-          echo "ref: ${{ github.ref }}"
-          echo "ref name: ${{ github.ref_name }}"
-
       - name: terraform test
         uses: dflook/terraform-test@v2
         with:
-          var_file: "${{ github.head_ref }}.tfvars"
+          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
 
   validate:
+    needs: init
     name: validate
     runs-on: ubuntu-latest
     steps:
@@ -53,12 +62,12 @@ jobs:
       - name: Terraform Validate
         uses: dflook/terraform-validate@v2
         with:
-          workspace: ${{ github.head_ref }}
+          workspace: ${{ needs.init.outputs.workspace }}
 
 
   plan:
     if: github.event_name == 'pull_request'
-    needs: [lint, test, validate]
+    needs: [lint, test, validate, init]
     name: plan
     runs-on: ubuntu-latest
     steps:
@@ -67,8 +76,8 @@ jobs:
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
-          workspace: ${{ github.head_ref }}
-          var_file: "${{ github.head_ref }}.tfvars"
+          workspace: ${{ needs.init.outputs.workspace }}
+          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
 
   pre-cost-analysis:
     needs: plan
