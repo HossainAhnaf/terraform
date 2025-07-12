@@ -11,33 +11,15 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   GITHUB_TOKEN: ${{ github.token }}
+  WORKSPACE_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+  TFVARS_FILE: ${{ github.ref_name == 'main' && 'prod.tfvars' || format('{0}.tfvars', github.ref_name) }}
 
 permissions:
   contents: read
   pull-requests: write
 jobs:
-  init:
-    name: Determine Workspace
-    runs-on: ubuntu-latest
-    outputs:
-      workspace: ${{ steps.set_workspace.outputs.workspace }}
-    steps:
-      - id: set_workspace
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            branch="${GITHUB_HEAD_REF}"
-          else
-            branch="${GITHUB_REF_NAME}"
-          fi
-
-          if [[ "$branch" == "main" ]]; then
-            echo "workspace=prod" >> $GITHUB_OUTPUT
-          else
-            echo "workspace=$branch" >> $GITHUB_OUTPUT
-          fi
 
   lint:
-    needs: init
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +29,6 @@ jobs:
         uses: dflook/terraform-fmt-check@v2
 
   test:
-    needs: init
     name: test
     runs-on: ubuntu-latest
     steps:
@@ -56,10 +37,9 @@ jobs:
       - name: terraform test
         uses: dflook/terraform-test@v2
         with:
-          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
+          var_file: ${{ env.TFVARS_FILE }}
 
   validate:
-    needs: init
     name: validate
     runs-on: ubuntu-latest
     steps:
@@ -68,12 +48,12 @@ jobs:
       - name: Terraform Validate
         uses: dflook/terraform-validate@v2
         with:
-          workspace: ${{ needs.init.outputs.workspace }}
+          workspace: ${{ env.WORKSPACE_NAME }}
 
 
   plan:
     if: github.event_name == 'pull_request'
-    needs: [lint, test, validate, init]
+    needs: [lint, test, validate]
     name: plan
     runs-on: ubuntu-latest
     steps:
@@ -82,8 +62,8 @@ jobs:
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
-          workspace: ${{ needs.init.outputs.workspace }}
-          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
+          workspace: ${{ env.WORKSPACE_NAME }}
+          var_file: ${{ env.TFVARS_FILE }}
 
   pre-cost-analysis:
     needs: plan
