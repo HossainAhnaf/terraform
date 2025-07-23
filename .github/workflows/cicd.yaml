@@ -50,6 +50,9 @@ jobs:
 
   test:
     name: test
+    strategy:
+      matrix:
+        workspace: [dev, prod]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +60,7 @@ jobs:
       - name: terraform test
         uses: dflook/terraform-test@v2
         with:
-          var_file: ${{ env.TFVARS_FILE }}
+          var_file: ${{ matrix.workspace }}.tfvars
 
   validate:
     name: validate
@@ -67,8 +70,6 @@ jobs:
 
       - name: Terraform Validate
         uses: dflook/terraform-validate@v2
-        with:
-          workspace: ${{ env.WORKSPACE_NAME }}
 
   scan:
     name: Security Scan
@@ -93,6 +94,9 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [lint, test, validate, format, scan]
     name: plan
+    strategy:
+      matrix:
+        workspace: [dev, prod]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -100,8 +104,8 @@ jobs:
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
-          workspace: ${{ env.WORKSPACE_NAME }}
-          var_file: ${{ env.TFVARS_FILE }}
+          workspace: ${{ matrix.workspace }}
+          var_file: ${{ matrix.workspace }}.tfvars
 
   pre-cost-analysis:
     needs: plan
@@ -134,10 +138,6 @@ jobs:
           infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost-base.json \
-                                 --terraform-var-file="dev.tfvars"
-
-
-
 
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
@@ -193,7 +193,6 @@ jobs:
           infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
-                                 --terraform-var-file=dev.tfvars
 
       - name: upload cost report
         uses: actions/upload-artifact@v4.6.2

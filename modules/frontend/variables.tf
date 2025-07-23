@@ -1,8 +1,3 @@
-variable "prefix" {
-  description = "The prefix used for all resources"
-  type        = string
-}
-
 variable "location" {
   description = "The location/region where the resources are created."
   type        = string
@@ -10,6 +5,16 @@ variable "location" {
 
 variable "resource_group_name" {
   description = "The resource group name"
+  type        = string
+}
+
+variable "frontend_plan_name" {
+  description = "The frontend plan name"
+  type        = string
+}
+
+variable "frontend_webapp_name" {
+  description = "The frontend webapp name"
   type        = string
 }
 
