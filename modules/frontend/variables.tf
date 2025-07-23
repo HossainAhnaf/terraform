@@ -1,4 +1,4 @@
-variable "naming_suffix" {
+variable "extra_naming_suffix" {
   description = "The naming suffix"
   type        = list(string)
 }

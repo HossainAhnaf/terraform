@@ -17,7 +17,7 @@ resource "azurerm_virtual_network" "main" {
 
 module "database" {
   source                 = "./modules/database"
-  naming_suffix          = local.suffix
+  extra_naming_suffix    = local.suffix
   location               = azurerm_resource_group.main.location
   resource_group_name    = azurerm_resource_group.main.name
   server_sku_name        = var.server_sku_name
@@ -31,7 +31,7 @@ module "database" {
 
 module "backend" {
   source               = "./modules/backend"
-  naming_suffix        = local.suffix
+  extra_naming_suffix  = local.suffix
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
@@ -52,7 +52,7 @@ module "backend" {
 
 module "frontend" {
   source              = "./modules/frontend"
-  naming_suffix       = local.suffix
+  extra_naming_suffix = local.suffix
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = var.frontend_sku_name
