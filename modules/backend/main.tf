@@ -1,6 +1,6 @@
 module "naming" {
   source = "git::https://github.com/Azure/terraform-azurerm-naming.git?ref=75d5afa"
-  suffix = concat(local.naming_suffix, var.extra_naming_suffix)
+  suffix = concat(local.naming_suffix, local.filtered_suffix)
 }
 
 resource "azurerm_subnet" "backend_subnet" {

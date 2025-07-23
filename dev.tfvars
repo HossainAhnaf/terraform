@@ -1,5 +1,3 @@
-prefix = "hossain"
-
 location = "centralus"
 
 server_sku_name        = "B_Standard_B1ms"
