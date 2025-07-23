@@ -1,10 +1,21 @@
-variable "prefix" {
-  description = "The prefix used for all resources"
-  type        = string
-}
+
 
 variable "location" {
   description = "The location/region where the resources are created."
+  type        = string
+}
+
+
+variable "backend_subnet_name" {
+  description = "The backend subnet name"
+  type        = string
+}
+variable "backend_plan_name" {
+  description = "The backend plan name"
+  type        = string
+}
+variable "backend_webapp_name" {
+  description = "The backend webapp name"
   type        = string
 }
 

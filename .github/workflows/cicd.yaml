@@ -11,34 +11,16 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   GITHUB_TOKEN: ${{ github.token }}
+  WORKSPACE_NAME: ${{ github.ref_name == 'main' && 'prod' || github.ref_name }}
+  TFVARS_FILE: ${{ github.ref_name == 'main' && 'prod.tfvars' || format('{0}.tfvars', github.ref_name) }}
 
 permissions:
   contents: read
   pull-requests: write
 jobs:
-  init:
-    name: Determine Workspace
-    runs-on: ubuntu-latest
-    outputs:
-      workspace: ${{ steps.set_workspace.outputs.workspace }}
-    steps:
-      - id: set_workspace
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            branch="${GITHUB_HEAD_REF}"
-          else
-            branch="${GITHUB_REF_NAME}"
-          fi
 
-          if [[ "$branch" == "main" ]]; then
-            echo "workspace=prod" >> $GITHUB_OUTPUT
-          else
-            echo "workspace=$branch" >> $GITHUB_OUTPUT
-          fi
-
-  lint:
-    needs: init
-    name: lint
+  format:
+    name: format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,9 +28,31 @@ jobs:
       - name: terraform fmt check
         uses: dflook/terraform-fmt-check@v2
 
+  lint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout source code
+
+    - uses: actions/cache@v4
+      with:
+        path: ~/.tflint.d/plugins
+        key: tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v4
+
+    - name: Init TFLint
+      run: tflint --init
+
+    - name: Run TFLint
+      run: tflint --config="$(pwd)/.tflint.hcl" --recursive
+
   test:
-    needs: init
     name: test
+    strategy:
+      matrix:
+        workspace: [dev, prod]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,10 +60,9 @@ jobs:
       - name: terraform test
         uses: dflook/terraform-test@v2
         with:
-          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
+          var_file: ${{ matrix.workspace }}.tfvars
 
   validate:
-    needs: init
     name: validate
     runs-on: ubuntu-latest
     steps:
@@ -67,14 +70,33 @@ jobs:
 
       - name: Terraform Validate
         uses: dflook/terraform-validate@v2
-        with:
-          workspace: ${{ needs.init.outputs.workspace }}
 
+  scan:
+    name: Security Scan
+    permissions:
+      security-events: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
 
   plan:
     if: github.event_name == 'pull_request'
-    needs: [lint, test, validate, init]
+    needs: [lint, test, validate, format, scan]
     name: plan
+    strategy:
+      matrix:
+        workspace: [dev, prod]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -82,8 +104,8 @@ jobs:
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
-          workspace: ${{ needs.init.outputs.workspace }}
-          var_file: "${{ needs.init.outputs.workspace }}.tfvars"
+          workspace: ${{ matrix.workspace }}
+          var_file: ${{ matrix.workspace }}.tfvars
 
   pre-cost-analysis:
     needs: plan
@@ -116,10 +138,6 @@ jobs:
           infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost-base.json \
-                                 --terraform-var-file="dev.tfvars"
-
-
-
 
       - name: Checkout Pr Branch
         uses: actions/checkout@v4
@@ -144,7 +162,7 @@ jobs:
 
   apply:
     if: github.ref_name == 'main' && github.event_name == 'push'
-    needs: [lint, test, validate]
+    needs: [lint, test, validate, format, scan]
     name: apply
     runs-on: ubuntu-latest
     environment: production
@@ -175,7 +193,6 @@ jobs:
           infracost breakdown --path=. \
                                  --format=json \
                                  --out-file=/tmp/infracost.json \
-                                 --terraform-var-file=dev.tfvars
 
       - name: upload cost report
         uses: actions/upload-artifact@v4.6.2
