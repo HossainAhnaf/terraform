@@ -1,3 +1,8 @@
+variable "extra_naming_suffix" {
+  description = "The naming suffix"
+  type        = list(string)
+}
+
 variable "location" {
   description = "The location/region where the resources are created."
   type        = string
@@ -8,15 +13,6 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "frontend_plan_name" {
-  description = "The frontend plan name"
-  type        = string
-}
-
-variable "frontend_webapp_name" {
-  description = "The frontend webapp name"
-  type        = string
-}
 
 variable "sku_name" {
   description = "The sku name"
