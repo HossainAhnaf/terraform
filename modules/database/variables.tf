@@ -1,4 +1,7 @@
-
+variable "naming_suffix" {
+  description = "The naming suffix"
+  type        = list(string)
+}
 variable "location" {
   description = "The location/region where the resources are created."
   type        = string
@@ -41,11 +44,6 @@ variable "administrator_password" {
   type        = string
 }
 
-variable "database_name" {
-  description = "The mysql database name"
-  type        = string
-}
-
 variable "charset" {
   description = "The mysql charset"
   default     = "utf8mb4"
@@ -55,38 +53,4 @@ variable "collation" {
   description = "The mysql collation"
   default     = "utf8mb4_unicode_ci"
   type        = string
-}
-
-variable "private_endpoint_name" {
-  description = "The private endpoint name"
-  type        = string
-}
-variable "private_dns_zone_group_name" {
-  description = "The private dns zone group name"
-  type        = string
-}
-variable "private_service_connection_name" {
-  description = "The private service connection name"
-  type        = string
-}
-
-variable "server_subnet_name" {
-  description = "The server subnet name"
-  type        = string
-
-}
-
-variable "private_link_service_name" {
-  description = "The private link service name"
-  type        = string
-}
-
-variable "private_dns_zone_name" {
-  description = "The private dns zone name"
-  type        = string
-}
-variable "mysql_server_name" {
-  description = "The mysql server name"
-  type        = string
-
 }

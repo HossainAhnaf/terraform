@@ -1,6 +1,10 @@
-# tuaa tuaang
+module "naming" {
+  source = "git::https://github.com/Azure/terraform-azurerm-naming.git?ref=75d5afa"
+  suffix = var.naming_suffix
+}
+
 resource "azurerm_subnet" "server_subnet" {
-  name                 = var.server_subnet_name
+  name                 = module.naming.subnet.name_unique
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.virtual_network_name
   address_prefixes     = var.address_prefixes
@@ -8,12 +12,12 @@ resource "azurerm_subnet" "server_subnet" {
 }
 
 resource "azurerm_private_dns_zone" "server" {
-  name                = var.private_dns_zone_name
+  name                = module.naming.private_dns_zone.name_unique
   resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "server" {
-  name                  = var.private_link_service_name
+  name                  = module.naming.private_link_service.name_unique
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.server.name
   virtual_network_id    = var.virtual_network_id
@@ -21,7 +25,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "server" {
 
 
 resource "azurerm_mysql_flexible_server" "main" {
-  name                         = var.mysql_server_name
+  name                         = module.naming.mysql_server.name_unique
   resource_group_name          = var.resource_group_name
   location                     = var.location
   version                      = var.database_version
@@ -35,7 +39,7 @@ resource "azurerm_mysql_flexible_server" "main" {
 }
 
 resource "azurerm_mysql_flexible_database" "main" {
-  name                = var.database_name
+  name                = module.naming.mysql_database.name_unique
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_flexible_server.main.name
   charset             = var.charset
@@ -43,18 +47,18 @@ resource "azurerm_mysql_flexible_database" "main" {
 }
 
 resource "azurerm_private_endpoint" "mysql_pe" {
-  name                = var.private_endpoint_name
+  name                = module.naming.private_endpoint.name_unique
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = azurerm_subnet.server_subnet.id
 
   private_dns_zone_group {
-    name                 = var.private_dns_zone_group_name
+    name                 = module.naming.private_dns_zone_group.name_unique
     private_dns_zone_ids = [azurerm_private_dns_zone.server.id]
   }
 
   private_service_connection {
-    name                           = var.private_service_connection_name
+    name                           = module.naming.private_service_connection.name_unique
     private_connection_resource_id = azurerm_mysql_flexible_server.main.id
     subresource_names              = ["mysqlServer"] # For MySQL Flexible Server
     is_manual_connection           = false
