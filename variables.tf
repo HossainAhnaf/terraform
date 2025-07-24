@@ -32,7 +32,7 @@ variable "frontend_asp_zone_balancing_enabled" {
   description = "The zone balancing enabled"
   type        = bool
 }
-variable "frontend_asp_premium_plan_auto_scale_enabled" {
+variable "frontend_asp_rule_based_scale_enabled" {
   description = "The premium plan auto scale enabled"
   type        = bool
 }
@@ -65,7 +65,7 @@ variable "backend_asp_zone_balancing_enabled" {
   description = "The zone balancing enabled"
   type        = bool
 }
-variable "backend_asp_premium_plan_auto_scale_enabled" {
+variable "backend_asp_rule_based_scale_enabled" {
   description = "The premium plan auto scale enabled"
   type        = bool
 }

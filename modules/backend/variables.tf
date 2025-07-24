@@ -28,8 +28,8 @@ variable "asp_zone_balancing_enabled" {
   type        = bool
 }
 
-variable "asp_premium_plan_auto_scale_enabled" {
-  description = "The premium plan auto scale enabled"
+variable "asp_rule_based_scale_enabled" {
+  description = "The rule based scale enabled"
   type        = bool
 }
 

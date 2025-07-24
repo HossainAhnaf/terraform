@@ -3,8 +3,21 @@ module "naming" {
   suffix = var.naming_suffix
 }
 
+module "avm-res-web-serverfarm" {
+  source                 = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm.git?ref=8ca49e283a7ede30927377cee1154b3cde8a81cc"
+  enable_telemetry       = false
+  name                   = module.naming.app_service_plan.name
+  location               = var.location
+  resource_group_name    = var.resource_group_name
+  os_type                = var.os_type
+  sku_name               = var.sku_name
+  worker_count           = var.worker_count
+  zone_balancing_enabled = var.zone_balancing_enabled
+}
+
+
 resource "azurerm_monitor_autoscale_setting" "app_service_plan_autoscale" {
-  count               = var.premium_plan_auto_scale_enabled ? 1 : 0
+  count               = var.rule_based_scale_enabled ? 1 : 0
   name                = module.naming.monitor_autoscale_setting.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -57,18 +70,4 @@ resource "azurerm_monitor_autoscale_setting" "app_service_plan_autoscale" {
     }
 
   }
-}
-
-
-module "avm-res-web-serverfarm" {
-  source                          = "git::https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm.git?ref=8ca49e283a7ede30927377cee1154b3cde8a81cc"
-  enable_telemetry                = false
-  name                            = module.naming.app_service_plan.name
-  location                        = var.location
-  resource_group_name             = var.resource_group_name
-  os_type                         = var.os_type
-  sku_name                        = var.sku_name
-  worker_count                    = var.worker_count
-  zone_balancing_enabled          = var.zone_balancing_enabled
-  premium_plan_auto_scale_enabled = var.premium_plan_auto_scale_enabled
 }

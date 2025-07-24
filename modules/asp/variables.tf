@@ -85,7 +85,7 @@ variable "scale_in_rule" {
     }
     scale_action = {
       type     = "ChangeCount"
-      value    = -1
+      value    = 1
       cooldown = "PT1M"
     }
   }
@@ -97,8 +97,8 @@ variable "zone_balancing_enabled" {
   type        = bool
 }
 
-variable "premium_plan_auto_scale_enabled" {
-  description = "The premium plan auto scale enabled"
+variable "rule_based_scale_enabled" {
+  description = "The rule based scale enabled"
   type        = bool
 }
 

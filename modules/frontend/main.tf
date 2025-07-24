@@ -4,15 +4,15 @@ module "naming" {
 }
 
 module "asp" {
-  source                          = "../asp"
-  naming_suffix                   = concat(local.naming_suffix, var.extra_naming_suffix)
-  resource_group_name             = var.resource_group_name
-  location                        = var.location
-  os_type                         = var.os_type
-  sku_name                        = var.asp_sku_name
-  worker_count                    = var.asp_worker_count
-  zone_balancing_enabled          = var.asp_zone_balancing_enabled
-  premium_plan_auto_scale_enabled = var.asp_premium_plan_auto_scale_enabled
+  source                   = "../asp"
+  naming_suffix            = concat(local.naming_suffix, var.extra_naming_suffix)
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  os_type                  = var.os_type
+  sku_name                 = var.asp_sku_name
+  worker_count             = var.asp_worker_count
+  zone_balancing_enabled   = var.asp_zone_balancing_enabled
+  rule_based_scale_enabled = var.asp_rule_based_scale_enabled
 
 }
 
