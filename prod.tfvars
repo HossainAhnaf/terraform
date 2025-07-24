@@ -6,13 +6,13 @@ administrator_login      = "mysqladmin"
 administrator_password   = "P@ssw0rd123!" # ⚠️ NEVER commit this file to Git
 db_private_dns_zone_name = "privatelink.mysql.database.azure.com"
 
-frontend_asp_sku_name                        = "P1v2"
+frontend_asp_sku_name                        = "S1"
 frontend_os_type                             = "Linux"
 frontend_asp_zone_balancing_enabled          = false
 frontend_asp_premium_plan_auto_scale_enabled = true
 frontend_asp_worker_count                    = 1
 
-backend_asp_sku_name                        = "P1v2"
+backend_asp_sku_name                        = "S1"
 backend_os_type                             = "Linux"
 backend_asp_worker_count                    = 1
 backend_asp_zone_balancing_enabled          = false

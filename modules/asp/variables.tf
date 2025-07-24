@@ -31,8 +31,8 @@ variable "capacity" {
   }
 }
 
-variable "scale_up_rule" {
-  description = "Scale-up rule configuration."
+variable "scale_out_rule" {
+  description = "Scale-out rule configuration."
   type = object({
     metric_trigger = object({
       metric_name = string
@@ -61,8 +61,8 @@ variable "scale_up_rule" {
   }
 }
 
-variable "scale_down_rule" {
-  description = "Scale-down rule configuration."
+variable "scale_in_rule" {
+  description = "Scale-in rule configuration."
   type = object({
     metric_trigger = object({
       metric_name = string

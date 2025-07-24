@@ -17,42 +17,42 @@ resource "azurerm_monitor_autoscale_setting" "app_service_plan_autoscale" {
       minimum = var.capacity.minimum
       maximum = var.capacity.maximum
     }
-    # scale up
+    # scale out
     rule {
       metric_trigger {
-        metric_name        = var.scale_up_rule.metric_trigger.metric_name
+        metric_name        = var.scale_out_rule.metric_trigger.metric_name
         metric_resource_id = module.avm-res-web-serverfarm.resource_id
         operator           = "GreaterThan"
-        threshold          = var.scale_up_rule.metric_trigger.threshold
+        threshold          = var.scale_out_rule.metric_trigger.threshold
         statistic          = "Average"
         time_aggregation   = "Average"
-        time_grain         = var.scale_up_rule.metric_trigger.time_grain
-        time_window        = var.scale_up_rule.metric_trigger.time_window
+        time_grain         = var.scale_out_rule.metric_trigger.time_grain
+        time_window        = var.scale_out_rule.metric_trigger.time_window
       }
       scale_action {
         direction = "Increase"
-        type      = var.scale_up_rule.scale_action.type
-        value     = var.scale_up_rule.scale_action.value
-        cooldown  = var.scale_up_rule.scale_action.cooldown
+        type      = var.scale_out_rule.scale_action.type
+        value     = var.scale_out_rule.scale_action.value
+        cooldown  = var.scale_out_rule.scale_action.cooldown
       }
     }
-    # scale down
+    # scale in
     rule {
       metric_trigger {
-        metric_name        = var.scale_down_rule.metric_trigger.metric_name
+        metric_name        = var.scale_in_rule.metric_trigger.metric_name
         metric_resource_id = module.avm-res-web-serverfarm.resource_id
         operator           = "LessThan"
-        threshold          = var.scale_down_rule.metric_trigger.threshold
+        threshold          = var.scale_in_rule.metric_trigger.threshold
         statistic          = "Average"
         time_aggregation   = "Average"
-        time_grain         = var.scale_down_rule.metric_trigger.time_grain
-        time_window        = var.scale_down_rule.metric_trigger.time_window
+        time_grain         = var.scale_in_rule.metric_trigger.time_grain
+        time_window        = var.scale_in_rule.metric_trigger.time_window
       }
       scale_action {
         direction = "Decrease"
-        type      = var.scale_down_rule.scale_action.type
-        value     = var.scale_down_rule.scale_action.value
-        cooldown  = var.scale_down_rule.scale_action.cooldown
+        type      = var.scale_in_rule.scale_action.type
+        value     = var.scale_in_rule.scale_action.value
+        cooldown  = var.scale_in_rule.scale_action.cooldown
       }
     }
 
