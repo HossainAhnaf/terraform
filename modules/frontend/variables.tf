@@ -13,8 +13,17 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "asp_zone_balancing_enabled" {
+  description = "The zone balancing enabled"
+  type        = bool
+}
 
-variable "sku_name" {
+variable "asp_premium_plan_auto_scale_enabled" {
+  description = "The premium plan auto scale enabled"
+  type        = bool
+}
+
+variable "asp_sku_name" {
   description = "The sku name"
   type        = string
 }
@@ -24,7 +33,7 @@ variable "os_type" {
   type        = string
 }
 
-variable "worker_count" {
+variable "asp_worker_count" {
   description = "The worker count"
   type        = number
 }

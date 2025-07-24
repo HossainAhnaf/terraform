@@ -54,3 +54,9 @@ variable "collation" {
   default     = "utf8mb4_unicode_ci"
   type        = string
 }
+
+variable "private_dns_zone_name" {
+  description = "The private dns zone name"
+  type        = string
+
+}

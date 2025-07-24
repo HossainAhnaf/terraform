@@ -1,4 +1,3 @@
-
 variable "location" {
   description = "Azure region where resources will be deployed"
   type        = string
@@ -25,9 +24,17 @@ variable "administrator_password" {
   sensitive   = true
 }
 
-variable "frontend_sku_name" {
+variable "frontend_asp_sku_name" {
   description = "SKU for frontend App Service Plan"
   type        = string
+}
+variable "frontend_asp_zone_balancing_enabled" {
+  description = "The zone balancing enabled"
+  type        = bool
+}
+variable "frontend_asp_premium_plan_auto_scale_enabled" {
+  description = "The premium plan auto scale enabled"
+  type        = bool
 }
 
 variable "frontend_os_type" {
@@ -35,12 +42,12 @@ variable "frontend_os_type" {
   type        = string
 }
 
-variable "frontend_worker_count" {
+variable "frontend_asp_worker_count" {
   description = "Number of workers for frontend App Service Plan"
   type        = number
 }
 
-variable "backend_sku_name" {
+variable "backend_asp_sku_name" {
   description = "SKU for backend App Service Plan"
   type        = string
 }
@@ -50,9 +57,17 @@ variable "backend_os_type" {
   type        = string
 }
 
-variable "backend_worker_count" {
+variable "backend_asp_worker_count" {
   description = "Number of workers for backend App Service Plan"
   type        = number
+}
+variable "backend_asp_zone_balancing_enabled" {
+  description = "The zone balancing enabled"
+  type        = bool
+}
+variable "backend_asp_premium_plan_auto_scale_enabled" {
+  description = "The premium plan auto scale enabled"
+  type        = bool
 }
 variable "docker_registry_url" {
   description = "Docker registry URL"
@@ -75,5 +90,10 @@ variable "frontend_docker_image_name" {
 
 variable "frontend_docker_image_tag" {
   description = "Docker image tag for frontend App Service"
+  type        = string
+}
+
+variable "db_private_dns_zone_name" {
+  description = "Private DNS zone name for MySQL flexible server"
   type        = string
 }
