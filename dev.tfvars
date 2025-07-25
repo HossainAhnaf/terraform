@@ -6,17 +6,16 @@ administrator_login      = "mysqladmin"
 administrator_password   = "P@ssw0rd123!" # ⚠️ NEVER commit this file to Git
 db_private_dns_zone_name = "privatelink.mysql.database.azure.com"
 
-frontend_asp_sku_name                 = "B1"
-frontend_os_type                      = "Linux"
-frontend_asp_zone_balancing_enabled   = false
-frontend_asp_rule_based_scale_enabled = true
-frontend_asp_worker_count             = 1
+asp_os_type                  = "Linux"
+asp_sku_name                 = "S1"
+asp_zone_balancing_enabled   = false
+asp_rule_based_scale_enabled = true
+asp_worker_count             = 1
 
-backend_asp_sku_name                 = "B1"
-backend_os_type                      = "Linux"
-backend_asp_worker_count             = 1
-backend_asp_zone_balancing_enabled   = false
-backend_asp_rule_based_scale_enabled = true
+
+backend_os_type  = "Linux"
+frontend_os_type = "Linux"
+
 
 docker_registry_url        = "https://ghcr.io/hossainahnaf"
 backend_docker_image_name  = "spring-react-devops-appservice-backend"

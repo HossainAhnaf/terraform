@@ -30,22 +30,30 @@ module "database" {
   private_dns_zone_name  = var.db_private_dns_zone_name
 }
 
+module "asp" {
+  source                   = "./modules/asp"
+  naming_suffix            = local.suffix
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = var.location
+  os_type                  = var.asp_os_type
+  sku_name                 = var.asp_sku_name
+  worker_count             = var.asp_worker_count
+  zone_balancing_enabled   = var.asp_zone_balancing_enabled
+  rule_based_scale_enabled = var.asp_rule_based_scale_enabled
+}
 
 module "backend" {
-  source                       = "./modules/backend"
-  extra_naming_suffix          = local.suffix
-  location                     = azurerm_resource_group.main.location
-  resource_group_name          = azurerm_resource_group.main.name
-  virtual_network_name         = azurerm_virtual_network.main.name
-  address_prefixes             = local.backend_subnet_address_prefix
-  asp_sku_name                 = var.backend_asp_sku_name
-  os_type                      = var.backend_os_type
-  asp_zone_balancing_enabled   = var.backend_asp_zone_balancing_enabled
-  asp_rule_based_scale_enabled = var.backend_asp_rule_based_scale_enabled
-  asp_worker_count             = var.backend_asp_worker_count
-  docker_registry_url          = var.docker_registry_url
-  docker_image_name            = var.backend_docker_image_name
-  docker_image_tag             = var.backend_docker_image_tag
+  source               = "./modules/backend"
+  extra_naming_suffix  = local.suffix
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = local.backend_subnet_address_prefix
+  os_type              = var.backend_os_type
+  asp_resource_id      = module.asp.resource_id
+  docker_registry_url  = var.docker_registry_url
+  docker_image_name    = var.backend_docker_image_name
+  docker_image_tag     = var.backend_docker_image_tag
   app_settings = {
     SPRING_DATASOURCE_URL      = "jdbc:mysql://${module.database.server_fqdn}:3306/${module.database.database_name}?allowPublicKeyRetrieval=true&useSSL=true&createDatabaseIfNotExist=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Paris"
     SPRING_DATASOURCE_USERNAME = var.administrator_login
@@ -55,16 +63,14 @@ module "backend" {
 }
 
 module "frontend" {
-  source                       = "./modules/frontend"
-  extra_naming_suffix          = local.suffix
-  location                     = azurerm_resource_group.main.location
-  resource_group_name          = azurerm_resource_group.main.name
-  asp_sku_name                 = var.frontend_asp_sku_name
-  os_type                      = var.frontend_os_type
-  asp_zone_balancing_enabled   = var.frontend_asp_zone_balancing_enabled
-  asp_rule_based_scale_enabled = var.frontend_asp_rule_based_scale_enabled
-  asp_worker_count             = var.frontend_asp_worker_count
-  docker_registry_url          = var.docker_registry_url
-  docker_image_name            = var.frontend_docker_image_name
-  docker_image_tag             = var.frontend_docker_image_tag
+  source              = "./modules/frontend"
+  extra_naming_suffix = local.suffix
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  os_type             = var.frontend_os_type
+  asp_resource_id     = module.asp.resource_id
+
+  docker_registry_url = var.docker_registry_url
+  docker_image_name   = var.frontend_docker_image_name
+  docker_image_tag    = var.frontend_docker_image_tag
 }

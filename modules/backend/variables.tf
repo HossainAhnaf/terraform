@@ -4,6 +4,16 @@ variable "extra_naming_suffix" {
   type        = list(string)
 }
 
+variable "os_type" {
+  description = "The os type"
+  type        = string
+}
+
+variable "asp_resource_id" {
+  description = "The app service plan resource id"
+  type        = string
+}
+
 variable "location" {
   description = "The location/region where the resources are created."
   type        = string
@@ -21,31 +31,6 @@ variable "virtual_network_name" {
 variable "address_prefixes" {
   description = "The address prefixes"
   type        = list(string)
-}
-
-variable "asp_zone_balancing_enabled" {
-  description = "The zone balancing enabled"
-  type        = bool
-}
-
-variable "asp_rule_based_scale_enabled" {
-  description = "The rule based scale enabled"
-  type        = bool
-}
-
-variable "asp_sku_name" {
-  description = "The sku name"
-  type        = string
-}
-
-variable "os_type" {
-  description = "The os type"
-  type        = string
-}
-
-variable "asp_worker_count" {
-  description = "The worker count"
-  type        = number
 }
 
 

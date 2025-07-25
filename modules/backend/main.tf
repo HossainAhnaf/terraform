@@ -3,17 +3,6 @@ module "naming" {
   suffix = concat(local.naming_suffix, local.filtered_suffix)
 }
 
-module "asp" {
-  source                   = "../asp"
-  naming_suffix            = concat(local.naming_suffix, local.filtered_suffix)
-  resource_group_name      = var.resource_group_name
-  location                 = var.location
-  os_type                  = var.os_type
-  sku_name                 = var.asp_sku_name
-  worker_count             = var.asp_worker_count
-  zone_balancing_enabled   = var.asp_zone_balancing_enabled
-  rule_based_scale_enabled = var.asp_rule_based_scale_enabled
-}
 
 
 resource "azurerm_subnet" "backend_subnet" {
@@ -40,7 +29,7 @@ module "avm-res-web-site" {
   kind                     = "webapp"
   location                 = var.location
   resource_group_name      = var.resource_group_name
-  service_plan_resource_id = module.asp.resource_id
+  service_plan_resource_id = var.asp_resource_id
   os_type                  = var.os_type
   site_config = {
     application_stack = {

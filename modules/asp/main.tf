@@ -15,7 +15,6 @@ module "avm-res-web-serverfarm" {
   zone_balancing_enabled = var.zone_balancing_enabled
 }
 
-
 resource "azurerm_monitor_autoscale_setting" "app_service_plan_autoscale" {
   count               = var.rule_based_scale_enabled ? 1 : 0
   name                = module.naming.monitor_autoscale_setting.name

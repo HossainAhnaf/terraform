@@ -24,51 +24,44 @@ variable "administrator_password" {
   sensitive   = true
 }
 
-variable "frontend_asp_sku_name" {
-  description = "SKU for frontend App Service Plan"
-  type        = string
-}
-variable "frontend_asp_zone_balancing_enabled" {
+
+variable "asp_zone_balancing_enabled" {
   description = "The zone balancing enabled"
   type        = bool
 }
-variable "frontend_asp_rule_based_scale_enabled" {
-  description = "The premium plan auto scale enabled"
+
+variable "asp_rule_based_scale_enabled" {
+  description = "The rule based scale enabled"
   type        = bool
 }
+
+variable "asp_sku_name" {
+  description = "The sku name"
+  type        = string
+}
+
+variable "asp_os_type" {
+  description = "The os type"
+  type        = string
+}
+
+variable "asp_worker_count" {
+  description = "The worker count"
+  type        = number
+}
+
 
 variable "frontend_os_type" {
   description = "OS type for frontend App Service Plan"
   type        = string
 }
 
-variable "frontend_asp_worker_count" {
-  description = "Number of workers for frontend App Service Plan"
-  type        = number
-}
-
-variable "backend_asp_sku_name" {
-  description = "SKU for backend App Service Plan"
-  type        = string
-}
 
 variable "backend_os_type" {
   description = "OS type for backend App Service Plan"
   type        = string
 }
 
-variable "backend_asp_worker_count" {
-  description = "Number of workers for backend App Service Plan"
-  type        = number
-}
-variable "backend_asp_zone_balancing_enabled" {
-  description = "The zone balancing enabled"
-  type        = bool
-}
-variable "backend_asp_rule_based_scale_enabled" {
-  description = "The premium plan auto scale enabled"
-  type        = bool
-}
 variable "docker_registry_url" {
   description = "Docker registry URL"
   type        = string
