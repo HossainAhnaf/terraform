@@ -1,5 +1,5 @@
 module "naming" {
-  source = "git::https://github.com/Azure/terraform-azurerm-naming.git?ref=75d5afa"
+  source = "git::https://github.com/Azure/terraform-azurerm-naming.git?ref=75d5afa" #https://xhamster.desi/videos/gorgeous-teen-deepthroating-13274965
   suffix = local.suffix
 }
 
