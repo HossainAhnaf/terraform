@@ -3,6 +3,15 @@ variable "extra_naming_suffix" {
   type        = list(string)
 }
 
+variable "os_type" {
+  description = "The os type"
+  type        = string
+}
+variable "asp_resource_id" {
+  description = "The app service plan resource id"
+  type        = string
+}
+
 variable "location" {
   description = "The location/region where the resources are created."
   type        = string
@@ -11,22 +20,6 @@ variable "location" {
 variable "resource_group_name" {
   description = "The resource group name"
   type        = string
-}
-
-
-variable "sku_name" {
-  description = "The sku name"
-  type        = string
-}
-
-variable "os_type" {
-  description = "The os type"
-  type        = string
-}
-
-variable "worker_count" {
-  description = "The worker count"
-  type        = number
 }
 
 variable "docker_registry_url" {

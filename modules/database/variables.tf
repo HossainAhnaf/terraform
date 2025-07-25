@@ -30,6 +30,14 @@ variable "server_sku_name" {
   type        = string
 }
 
+variable "server_storage" {
+  description = "The server storage"
+  type = object({
+    size_gb            = number
+    auto_grow_enabled  = bool
+    io_scaling_enabled = bool
+  })
+}
 variable "database_version" {
   description = "mysql database_version"
   type        = string
@@ -53,4 +61,10 @@ variable "collation" {
   description = "The mysql collation"
   default     = "utf8mb4_unicode_ci"
   type        = string
+}
+
+variable "private_dns_zone_name" {
+  description = "The private dns zone name"
+  type        = string
+
 }

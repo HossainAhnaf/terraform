@@ -12,7 +12,7 @@ resource "azurerm_subnet" "server_subnet" {
 }
 
 resource "azurerm_private_dns_zone" "server" {
-  name                = module.naming.private_dns_zone.name
+  name                = var.private_dns_zone_name
   resource_group_name = var.resource_group_name
 }
 
@@ -25,11 +25,18 @@ resource "azurerm_private_dns_zone_virtual_network_link" "server" {
 
 
 resource "azurerm_mysql_flexible_server" "main" {
-  name                         = module.naming.mysql_server.name
-  resource_group_name          = var.resource_group_name
-  location                     = var.location
-  version                      = var.database_version
-  sku_name                     = var.server_sku_name
+  name                = module.naming.mysql_server.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  version             = var.database_version
+  sku_name            = var.server_sku_name
+
+  storage {
+    size_gb            = var.server_storage.size_gb
+    auto_grow_enabled  = var.server_storage.auto_grow_enabled
+    io_scaling_enabled = var.server_storage.io_scaling_enabled
+  }
+
   administrator_login          = var.administrator_login
   administrator_password       = var.administrator_password
   private_dns_zone_id          = azurerm_private_dns_zone.server.id
@@ -44,6 +51,7 @@ resource "azurerm_mysql_flexible_database" "main" {
   server_name         = azurerm_mysql_flexible_server.main.name
   charset             = var.charset
   collation           = var.collation
+
 }
 
 resource "azurerm_private_endpoint" "mysql_pe" {

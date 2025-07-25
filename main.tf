@@ -21,12 +21,26 @@ module "database" {
   location               = azurerm_resource_group.main.location
   resource_group_name    = azurerm_resource_group.main.name
   server_sku_name        = var.server_sku_name
+  server_storage         = var.server_storage
   database_version       = var.database_version
   administrator_login    = var.administrator_login
   administrator_password = var.administrator_password
   virtual_network_name   = azurerm_virtual_network.main.name
   virtual_network_id     = azurerm_virtual_network.main.id
   address_prefixes       = local.db_subnet_address_prefix
+  private_dns_zone_name  = var.db_private_dns_zone_name
+}
+
+module "asp" {
+  source                   = "./modules/asp"
+  naming_suffix            = local.suffix
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = var.location
+  os_type                  = var.asp_os_type
+  sku_name                 = var.asp_sku_name
+  worker_count             = var.asp_worker_count
+  zone_balancing_enabled   = var.asp_zone_balancing_enabled
+  rule_based_scale_enabled = var.asp_rule_based_scale_enabled
 }
 
 module "backend" {
@@ -36,9 +50,8 @@ module "backend" {
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = local.backend_subnet_address_prefix
-  sku_name             = var.backend_sku_name
   os_type              = var.backend_os_type
-  worker_count         = var.backend_worker_count
+  asp_resource_id      = module.asp.resource_id
   docker_registry_url  = var.docker_registry_url
   docker_image_name    = var.backend_docker_image_name
   docker_image_tag     = var.backend_docker_image_tag
@@ -55,9 +68,9 @@ module "frontend" {
   extra_naming_suffix = local.suffix
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  sku_name            = var.frontend_sku_name
   os_type             = var.frontend_os_type
-  worker_count        = var.frontend_worker_count
+  asp_resource_id     = module.asp.resource_id
+
   docker_registry_url = var.docker_registry_url
   docker_image_name   = var.frontend_docker_image_name
   docker_image_tag    = var.frontend_docker_image_tag

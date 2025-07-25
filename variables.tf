@@ -1,4 +1,3 @@
-
 variable "location" {
   description = "Azure region where resources will be deployed"
   type        = string
@@ -7,6 +6,15 @@ variable "location" {
 variable "server_sku_name" {
   description = "SKU for MySQL flexible server"
   type        = string
+}
+
+variable "server_storage" {
+  description = "Storage configuration for MySQL flexible server"
+  type = object({
+    size_gb            = number
+    auto_grow_enabled  = bool
+    io_scaling_enabled = bool
+  })
 }
 
 variable "database_version" {
@@ -25,35 +33,44 @@ variable "administrator_password" {
   sensitive   = true
 }
 
-variable "frontend_sku_name" {
-  description = "SKU for frontend App Service Plan"
+
+variable "asp_zone_balancing_enabled" {
+  description = "The zone balancing enabled"
+  type        = bool
+}
+
+variable "asp_rule_based_scale_enabled" {
+  description = "The rule based scale enabled"
+  type        = bool
+}
+
+variable "asp_sku_name" {
+  description = "The sku name"
   type        = string
 }
+
+variable "asp_os_type" {
+  description = "The os type"
+  type        = string
+}
+
+variable "asp_worker_count" {
+  description = "The worker count"
+  type        = number
+}
+
 
 variable "frontend_os_type" {
   description = "OS type for frontend App Service Plan"
   type        = string
 }
 
-variable "frontend_worker_count" {
-  description = "Number of workers for frontend App Service Plan"
-  type        = number
-}
-
-variable "backend_sku_name" {
-  description = "SKU for backend App Service Plan"
-  type        = string
-}
 
 variable "backend_os_type" {
   description = "OS type for backend App Service Plan"
   type        = string
 }
 
-variable "backend_worker_count" {
-  description = "Number of workers for backend App Service Plan"
-  type        = number
-}
 variable "docker_registry_url" {
   description = "Docker registry URL"
   type        = string
@@ -75,5 +92,10 @@ variable "frontend_docker_image_name" {
 
 variable "frontend_docker_image_tag" {
   description = "Docker image tag for frontend App Service"
+  type        = string
+}
+
+variable "db_private_dns_zone_name" {
+  description = "Private DNS zone name for MySQL flexible server"
   type        = string
 }
