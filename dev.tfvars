@@ -13,9 +13,9 @@ administrator_password   = "P@ssw0rd123!" # ⚠️ NEVER commit this file to Git
 db_private_dns_zone_name = "privatelink.mysql.database.azure.com"
 
 asp_os_type                  = "Linux"
-asp_sku_name                 = "S1"
+asp_sku_name                 = "B1"
 asp_zone_balancing_enabled   = false
-asp_rule_based_scale_enabled = true
+asp_rule_based_scale_enabled = false
 asp_worker_count             = 1
 
 backend_os_type  = "Linux"
