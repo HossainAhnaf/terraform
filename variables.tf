@@ -8,6 +8,15 @@ variable "server_sku_name" {
   type        = string
 }
 
+variable "server_storage" {
+  description = "Storage configuration for MySQL flexible server"
+  type = object({
+    size_gb            = number
+    auto_grow_enabled  = bool
+    io_scaling_enabled = bool
+  })
+}
+
 variable "database_version" {
   description = "MySQL version"
   type        = string

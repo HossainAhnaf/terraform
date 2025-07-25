@@ -30,6 +30,14 @@ variable "server_sku_name" {
   type        = string
 }
 
+variable "server_storage" {
+  description = "The server storage"
+  type = object({
+    size_gb            = number
+    auto_grow_enabled  = bool
+    io_scaling_enabled = bool
+  })
+}
 variable "database_version" {
   description = "mysql database_version"
   type        = string

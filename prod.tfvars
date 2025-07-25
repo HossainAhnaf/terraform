@@ -1,6 +1,12 @@
 location = "centralus"
 
-server_sku_name          = "B_Standard_B1ms"
+server_sku_name = "B_Standard_B1ms"
+server_storage = {
+  size_gb            = 100
+  auto_grow_enabled  = true
+  io_scaling_enabled = true
+}
+
 database_version         = "8.0.21"
 administrator_login      = "mysqladmin"
 administrator_password   = "P@ssw0rd123!" # ⚠️ NEVER commit this file to Git
